@@ -5,7 +5,7 @@ FROM python:3.9-slim
 WORKDIR /app
 
 # Copie apenas os arquivos necessários para o contêiner
-COPY src/app/requirements.txt /app/requirements.txt
+COPY src/requirements.txt /app/requirements.txt
 
 # Instale as dependências do Python
 RUN pip install --no-cache-dir -r /app/requirements.txt
