@@ -1,0 +1,70 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: sistema-pagamentos-mock
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: sistema-pagamentos-mock
+  template:
+    metadata:
+      labels:
+        app: sistema-pagamentos-mock
+    spec:
+      containers:
+        - name: sistema-pagamentos-mock
+          image: 307946636040.dkr.ecr.sa-east-1.amazonaws.com/sistema-pagamento:latest
+          ports:
+            - containerPort: 5001
+          # Adição de variáveis de ambiente
+          env:
+            - name: DATABASE_DIALECT
+              value: "postgres"
+            - name: POSTGRES_HOST
+              valueFrom:
+                secretKeyRef:
+                  name: dbcredentialsv2
+                  key: host
+            - name: POSTGRES_PORT
+              valueFrom:
+                secretKeyRef:
+                  name: dbcredentialsv2
+                  key: port
+            - name: POSTGRES_USER
+              valueFrom:
+                secretKeyRef:
+                  name: dbcredentialsv2
+                  key: username
+            - name: POSTGRES_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: dbcredentialsv2
+                  key: password
+            - name: POSTGRES_DATABASE
+              valueFrom:
+                secretKeyRef:
+                  name: dbcredentialsv2
+                  key: db
+            - name: TYPEORM_CONNECTION
+              value: "postgres"
+            - name: TYPEORM_URL
+              valueFrom:
+                secretKeyRef:
+                  name: dbcredentialsv2
+                  key: typeorm
+            - name: REDIS_HOST
+              valueFrom:
+                secretKeyRef:
+                  name: dbcredentialsv2
+                  key: redis_host
+            - name: REDIS_PORT
+              valueFrom:
+                secretKeyRef:
+                  name: dbcredentialsv2
+                  key: redis_port
+            - name: REDIS_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: dbcredentialsv2
+                  key: redis_password
