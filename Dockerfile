@@ -4,11 +4,14 @@ FROM python:3.9-slim
 # Defina o diretório de trabalho
 WORKDIR /app
 
-# Copie o código-fonte do projeto para o contêiner
-COPY . /app/
+# Copie apenas os arquivos necessários para o contêiner
+COPY src/app/requirements.txt /app/requirements.txt
 
 # Instale as dependências do Python
 RUN pip install --no-cache-dir -r /app/requirements.txt
+
+# Copie todo o código-fonte do projeto para o contêiner
+COPY src/app /app
 
 # Defina a variável de ambiente para o Flask
 ENV FLASK_APP=/app/main.py
