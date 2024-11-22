@@ -1,0 +1,43 @@
+name: Build, Push Docker Images to ECR and Deploy to EKS
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+    environment: production
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout the code
+        uses: actions/checkout@v3
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ secrets.AWS_REGION }}
+
+      - name: Login to Amazon ECR
+        run: |
+          aws ecr get-login-password --region sa-east-1 | docker login --username AWS --password-stdin 307946636040.dkr.ecr.sa-east-1.amazonaws.com
+
+      - name: Build the Docker image for sistema-pagamentos-mock
+        run: |
+          docker build -t 307946636040.dkr.ecr.sa-east-1.amazonaws.com/sistema-pagamento:latest -f ./Dockerfile sistema-pagamentos-mock
+
+      - name: Push the Docker image for sistema-pagamentos-mock to ECR
+        run: |
+          docker push 307946636040.dkr.ecr.sa-east-1.amazonaws.com/sistema-pagamento:latest
+
+      - name: Configure Kubernetes credentials (kubectl)
+        run: |
+          aws eks update-kubeconfig --region sa-east-1 --name techchallenge
+
+      - name: Deploy Sistema Pagamento Mock to EKS
+        run: |
+          kubectl apply -f kubernetes/sistema-pagamento-deployment.yaml
+          kubectl apply -f kubernetes/sistema-pagamento-service.yaml
