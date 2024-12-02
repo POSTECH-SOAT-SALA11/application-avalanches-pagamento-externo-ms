@@ -12,15 +12,18 @@ jobs:
     runs-on: ubuntu-latest
 
     outputs:
-      approved: ${{ steps.check_approval.outputs.approved }}
+      approved: ${{ steps.approval.outputs.approved }}
 
     steps:
-      - name: Await approval
-        id: check_approval
-        uses: chetan/invoke-action@v1
-        with:
-          timeout_minutes: 60
-          action: "Aguardando aprovação para deploy no Kubernetes. Confirme ou recuse."
+      - name: Await manual approval
+        id: approval
+        run: |
+          echo "Aguardando aprovação para deploy no Kubernetes."
+          echo "::set-output name=approved::false" # Default output is false.
+          read -p "Aprovar deploy? (yes/no): " APPROVE
+          if [[ "$APPROVE" == "yes" ]]; then
+            echo "::set-output name=approved::true"
+          fi
 
   deploy:
     needs: wait-for-approval
