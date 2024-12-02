@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
         - name: sistema-pagamentos-mock
-          image: 307946636040.dkr.ecr.sa-east-1.amazonaws.com/sistema-pagamento:latest
+          image: 307946636040.dkr.ecr.sa-east-1.amazonaws.com/ms-pagamento-externo:latest
           ports:
             - containerPort: 5001
           # Adição de variáveis de ambiente
