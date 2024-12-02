@@ -11,7 +11,7 @@ COPY src/requirements.txt /app/requirements.txt
 RUN pip install --no-cache-dir -r /app/requirements.txt
 
 # Copie todo o código-fonte do projeto para o contêiner
-COPY src/app /app
+COPY src/ /app
 
 # Defina a variável de ambiente para o Flask
 ENV FLASK_APP=/app/main.py

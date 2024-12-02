@@ -1,0 +1,59 @@
+name: Approval and Deploy to Kubernetes
+
+on:
+  workflow_run:
+    workflows:
+      - Build and Push Docker Images to ECR
+    types:
+      - completed
+
+jobs:
+  wait-for-approval:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Await approval
+        uses: chetan/invoke-action@v1
+        with:
+          timeout_minutes: 60
+          action: "Aguardando aprovação para deploy no Kubernetes. Confirme ou recuse."
+        id: approval
+
+      - name: Set deployment status
+        id: deploy_status
+        run: |
+          if [[ "${{ steps.approval.outputs.approved }}" == "true" ]]; then
+            echo "Approved=true" >> $GITHUB_ENV
+          else
+            echo "Approved=false" >> $GITHUB_ENV
+
+  deploy:
+    needs: wait-for-approval
+    if: env.Approved == 'true'
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ secrets.AWS_REGION }}
+
+      - name: Configure Kubernetes credentials (kubectl)
+        run: |
+          aws eks update-kubeconfig --region sa-east-1 --name techchallenge
+
+      - name: Deploy to Kubernetes
+        run: |
+          kubectl apply -f kubernetes/sistema-pagamento-deployment.yaml
+          kubectl apply -f kubernetes/sistema-pagamento-service.yaml
+
+  notify-cancel:
+    needs: wait-for-approval
+    if: env.Approved == 'false'
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Notify deployment was skipped
+        run: echo "Deployment foi recusado ou o tempo de aprovação expirou. A esteira concluiu com sucesso."
