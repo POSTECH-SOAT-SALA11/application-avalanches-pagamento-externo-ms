@@ -11,25 +11,20 @@ jobs:
   wait-for-approval:
     runs-on: ubuntu-latest
 
+    outputs:
+      approved: ${{ steps.check_approval.outputs.approved }}
+
     steps:
       - name: Await approval
+        id: check_approval
         uses: chetan/invoke-action@v1
         with:
           timeout_minutes: 60
           action: "Aguardando aprovação para deploy no Kubernetes. Confirme ou recuse."
-        id: approval
-
-      - name: Set deployment status
-        id: deploy_status
-        run: |
-          if [[ "${{ steps.approval.outputs.approved }}" == "true" ]]; then
-            echo "Approved=true" >> $GITHUB_ENV
-          else
-            echo "Approved=false" >> $GITHUB_ENV
 
   deploy:
     needs: wait-for-approval
-    if: env.Approved == 'true'
+    if: ${{ needs.wait-for-approval.outputs.approved == 'true' }}
     runs-on: ubuntu-latest
 
     steps:
@@ -51,7 +46,7 @@ jobs:
 
   notify-cancel:
     needs: wait-for-approval
-    if: env.Approved == 'false'
+    if: ${{ needs.wait-for-approval.outputs.approved != 'true' }}
     runs-on: ubuntu-latest
 
     steps:
