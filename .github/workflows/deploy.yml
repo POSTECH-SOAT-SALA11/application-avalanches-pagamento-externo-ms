@@ -27,11 +27,11 @@ jobs:
 
       - name: Build the Docker image for sistema-pagamentos-mock
         run: |
-          docker build -t 307946636040.dkr.ecr.sa-east-1.amazonaws.com/sistema-pagamento:latest -f Dockerfile .
+          docker build -t 307946636040.dkr.ecr.sa-east-1.amazonaws.com/ms-pagamento-externo:latest -f Dockerfile .
 
       - name: Push the Docker image for sistema-pagamentos-mock to ECR
         run: |
-          docker push 307946636040.dkr.ecr.sa-east-1.amazonaws.com/sistema-pagamento:latest
+          docker push 307946636040.dkr.ecr.sa-east-1.amazonaws.com/ms-pagamento-externo:latest
 
       - name: Configure Kubernetes credentials (kubectl)
         run: |
