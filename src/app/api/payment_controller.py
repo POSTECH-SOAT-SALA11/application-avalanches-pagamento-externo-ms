@@ -1,6 +1,5 @@
 from flask import Blueprint, request, jsonify
 from app.core.use_cases.process_payment import ProcessPayment
-from app.infrastructure.db.payment_repository import PaymentRepository
 from app.infrastructure.web.payment_service import PaymentService
 import requests
 
@@ -9,8 +8,6 @@ payment_bp = Blueprint('payment', __name__)
 @payment_bp.route('/pagamento/<id_pedido>', methods=['POST'])
 def efetuar_pagamento(id_pedido):
     status_pagamento = PaymentService().process_payment(id_pedido)
-    repository = PaymentRepository()
-    repository.save_payment(id_pedido, status_pagamento)
 
     # Dados para o webhook
     webhook_data = {
@@ -19,7 +16,7 @@ def efetuar_pagamento(id_pedido):
     }
 
     # URL do webhook
-    webhook_url = 'http://k8s-default-ingressa-0faf251d7e-331796467.sa-east-1.elb.amazonaws.com:8080/avalanches/v1/pagamento/webhook'
+    webhook_url = 'http://k8s-default-ingressa-0faf251d7e-331796467.sa-east-1.elb.amazonaws.com:8080/avalanches/v1/pagamento-ms/webhook'
 
     # Enviar requisição POST para o webhook
     try:
