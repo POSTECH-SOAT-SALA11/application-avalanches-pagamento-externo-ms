@@ -16,8 +16,8 @@ def efetuar_pagamento(id_pedido):
     }
 
     # URL do webhook
-    webhook_url = 'http://k8s-default-ingressa-0faf251d7e-331796467.sa-east-1.elb.amazonaws.com:8080/avalanches/v1/pagamento-ms/webhook'
-
+    webhook_url = 'http://k8s-default-ingressa-0faf251d7e-890170821.sa-east-1.elb.amazonaws.com/avalanches/v1/pagamento/webhook"
+    
     # Enviar requisição POST para o webhook
     try:
         response = requests.post(webhook_url, json=webhook_data, headers={'Content-Type': 'application/json'})
