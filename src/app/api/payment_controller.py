@@ -1,4 +1,4 @@
-from flask import Blueprint, request, jsonify
+from flask import Blueprint, request, jsonify, abort
 from app.core.use_cases.process_payment import ProcessPayment
 from app.infrastructure.web.payment_service import PaymentService
 import requests
@@ -8,6 +8,9 @@ payment_bp = Blueprint('payment', __name__)
 @payment_bp.route('/pagamento/<id_pedido>', methods=['POST'])
 def efetuar_pagamento(id_pedido):
     status_pagamento = PaymentService().process_payment(id_pedido)
+
+    if status_pagamento != "APROVADO":
+        abort(400, description=f"Pagamento não aprovado para o pedido {id_pedido}. Status: {status_pagamento}")
 
     # Dados para o webhook
     webhook_data = {
