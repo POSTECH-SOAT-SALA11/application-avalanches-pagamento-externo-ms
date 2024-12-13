@@ -9,9 +9,6 @@ payment_bp = Blueprint('payment', __name__)
 def efetuar_pagamento(id_pedido):
     status_pagamento = PaymentService().process_payment(id_pedido)
 
-    if status_pagamento != "APROVADO":
-        abort(400, description=f"Pagamento não aprovado para o pedido {id_pedido}. Status: {status_pagamento}")
-
     # Dados para o webhook
     webhook_data = {
         "idPedido": id_pedido,
@@ -28,5 +25,8 @@ def efetuar_pagamento(id_pedido):
         print(f"Webhook acionado com sucesso: {response.status_code}")
     except requests.exceptions.RequestException as e:
         print(f"Erro ao acionar o webhook: {e}")
+  
+    if status_pagamento != "APROVADO":
+        abort(400, description=f"Pagamento não aprovado para o pedido {id_pedido}. Status: {status_pagamento}")
 
     return jsonify({"id_pedido": id_pedido, "status": status_pagamento})
